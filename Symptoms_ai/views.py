@@ -1,4 +1,3 @@
-
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import openai
@@ -15,12 +14,16 @@ def gpt3_api(request):
             user_input = data.get("user_input")
 
             if user_input:
-                response = openai.ChatCompletion.create(
-                    model="gpt-3.5-turbo",
-                    messages=[{"role": "system", "content": "You are a helpful assistant."},
-                              {"role": "user", "content": user_input}],
+                # Forming the conversation as a prompt with system and user messages
+                conversation = f"You are a virtual doctor providing medical advice.\nPatient: {user_input}"
+
+                response = openai.Completion.create(
+                    engine="text-davinci-002",
+                    prompt=conversation,
+                    max_tokens=150,
                 )
-                gpt3_response = response["choices"][0]["message"]["content"]
+
+                gpt3_response = response["choices"][0]["text"]
 
                 return JsonResponse({"response": gpt3_response})
             else:
