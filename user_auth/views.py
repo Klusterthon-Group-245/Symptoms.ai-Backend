@@ -1,37 +1,30 @@
-from django.shortcuts import render
+# views.py
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.authentication import authenticate
-from django.contrib.auth.hashers import make_password
-
+from rest_framework import status
+from django.contrib.auth import authenticate, login
 from .models import User
-from .serializers import UserSerializer
-
-
+from .serializers import UserSignupSerializer, UserSerializer
 
 class SignupAPI(APIView):
     def post(self, request):
-        serializer = UserSerializer(data=request.data)
+        serializer = UserSignupSerializer(data=request.data)
         if serializer.is_valid():
-            # Hash the password before saving
-            serializer.validated_data['password'] = make_password(serializer.validated_data['password'])
-            serializer.save()
-            return Response({'message': 'User created successfully', 'data': serializer.data})
+            user = serializer.save()
+            login(request, user)
+            return Response({'message': 'User created and logged in successfully', 'data': UserSerializer(user).data})
         else:
-            return Response(serializer.errors, status=400)
-
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class LoginAPI(APIView):
     def post(self, request):
         email = request.data.get('email')
         password = request.data.get('password')
 
-        print("Email:", email)
-        print("Password:", password)
-
         user = authenticate(request, email=email, password=password)
+
         if user is not None:
-            serializer = UserSerializer(user)
-            return Response(serializer.data)
+            login(request, user)
+            return Response({'message': 'Login successful', 'data': UserSerializer(user).data})
         else:
-            return Response({'error': 'Invalid credentials'}, status=401)
+            return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
