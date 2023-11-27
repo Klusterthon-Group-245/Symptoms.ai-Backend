@@ -4,9 +4,8 @@ from rest_framework import status
 from django.contrib.auth import authenticate, login
 from .models import User
 from django.contrib.auth.hashers import check_password
+from django.contrib.auth.hashers import make_password
 from .serializers import UserSignupSerializer, UserSerializer
-
-
 
 
 
@@ -32,4 +31,26 @@ class LoginAPI(APIView):
             return Response({'message': 'Login successful', 'data': UserSerializer(user).data})
         else:
             return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+
+
+
+class ResetPasswordAPI(APIView):
+    def post(self, request, user_id):
+        try:
+            user = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        new_password = request.data.get('new_password')
+        confirm_password = request.data.get('confirm_password')
+
+        if new_password != confirm_password:
+            return Response({'error': 'Passwords do not match'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Update user's password
+        user.password = make_password(new_password)
+        user.save()
+
+        return Response({'message': 'Password reset successfully', 'data': UserSerializer(user).data})
+
 
