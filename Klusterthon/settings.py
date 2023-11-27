@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from pathlib import Path
 import dj_database_url
 from dotenv import load_dotenv
-
+import os
 load_dotenv()
 
 
@@ -88,28 +88,11 @@ WSGI_APPLICATION = 'Klusterthon.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'symptoms_ai',
-#         'USER': 'symptoms',
-#         'PASSWORD': 'QuoMpoAPXzAeJLX23wtQQfba03nJqquI',
-#         'HOST': 'dpg-clhlcct8td7s73bpdbn0-a',
-#         'PORT': '5432',
-#     }
-# }
+PostgreSQL_URI = os.getenv("PostgreSQL_URI")
 
 DATABASES = {
-	"default": dj_database_url.parse("postgres://symptoms:QuoMpoAPXzAeJLX23wtQQfba03nJqquI@dpg-clhlcct8td7s73bpdbn0-a.frankfurt-postgres.render.com/symptoms_ai")
+	"default": dj_database_url.parse(PostgreSQL_URI)
 }
-
 
 
 
