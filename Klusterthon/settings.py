@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from pathlib import Path
 import dj_database_url
 from dotenv import load_dotenv
-
+import os
 load_dotenv()
 
 
@@ -88,8 +88,10 @@ WSGI_APPLICATION = 'Klusterthon.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+PostgreSQL_URI = os.getenv("PostgreSQL_URI")
+
 DATABASES = {
-	"default": dj_database_url.parse("postgres://symptoms:QuoMpoAPXzAeJLX23wtQQfba03nJqquI@dpg-clhlcct8td7s73bpdbn0-a.frankfurt-postgres.render.com/symptoms_ai")
+	"default": dj_database_url.parse(PostgreSQL_URI)
 }
 
 
